@@ -40,4 +40,7 @@ public class Btree {
         if(raiz!=null) return raiz.soma();
         return 0;
     }
+
+  
+    
 }

@@ -3,7 +3,8 @@ public class Bnode {
     private Bnode esq, dir;
     int critical = 0;
     private int altura;
-   
+    private int fatorBalanceamento;
+
    
 
     public Bnode(int valor) {
@@ -27,12 +28,7 @@ public class Bnode {
 
        
 
-        int fatorBalanceamento = calcularFatorDeBalanceamento(this);
-
-        if (calcularFatorDeBalanceamento(this) == -2 || calcularFatorDeBalanceamento(this) == 2 ) {
-            System.out.println("Fator de balanceamento do nó " + valor + ": " + 0);
-           
-        }
+         fatorBalanceamento = calcularFatorDeBalanceamento(this);
        
       
         System.out.println("Fator de balanceamento do nó " + x + ": " + fatorBalanceamento);
@@ -40,39 +36,59 @@ public class Bnode {
         if(fatorBalanceamento == -2 || fatorBalanceamento == 2 ){
             System.out.println("Nó crítico: "+ x);
             System.out.println("Balanceando ...");
-            atualizarAltura(this);
+              
             balancear(this);
         }
+        if (this.esq != null) {
+            int fatorEsq = calcularFatorDeBalanceamento(this.esq);
+            System.out.println("Fator de balanceamento do nó " + this.esq.x + ": " + fatorEsq);
+        }
+    
+        if (this.dir != null) {
+            int fatorDir = calcularFatorDeBalanceamento(this.dir);
+            System.out.println("Fator de balanceamento do nó " + this.dir.x + ": " + fatorDir);
+        }
+        atualizarAltura(this);
+       
     }
   
-    public void atualizarAltura(Bnode no) {
+   public void atualizarAltura(Bnode no) {
         int alturaEsq = 0, alturaDir = 0;
         if (no.esq != null) alturaEsq = no.esq.altura;
         if (no.dir != null) alturaDir = no.dir.altura;
         no.altura = Math.max(alturaEsq, alturaDir) + 1;
     }
     public Bnode balancear(Bnode no) {
-        int fatorBalanceamento = calcularFatorDeBalanceamento(no);
-
-       
-        if (fatorBalanceamento < -1) {
-            if (calcularFatorDeBalanceamento(no.dir) > 0) {
-                System.out.println("Rotação a direita ...");
-                no.dir = rotacaoDireita(no.dir);
-            }
-            System.out.println("Rotação a esquerda ...");
+        
+    
+        
+        if (fatorBalanceamento == 2) {
+            if(calcularFatorDeBalanceamento(no.esq) == 0){
+        
+         
+            
+            System.out.println("Rotação à esquerda em " + no.x + " ...");
             return rotacaoEsquerda(no); 
-        }
-        if (fatorBalanceamento > 1) {
-            if (calcularFatorDeBalanceamento(no.esq) < 0) {
-                System.out.println("Rotação a esquerda ...");
-                no.esq = rotacaoEsquerda(no.esq); 
+            }else if(calcularFatorDeBalanceamento(no.esq)!=0){
+                return rotacaoDuplaDireita(no);
+            }else {
+                return rotacaoDuplaEsquerda(no);
             }
-            System.out.println("Rotação a direita ...");
-            return rotacaoDireita(no); 
         }
 
-        return no; 
+        if (fatorBalanceamento == -2) {
+        if(calcularFatorDeBalanceamento(no.dir) == 0){
+        
+            System.out.println("Rotação à direita em " + no.x + " ...");
+            return rotacaoDireita(no); 
+        }else if(calcularFatorDeBalanceamento(no.dir)!=0){
+            return rotacaoDuplaDireita(no);
+        }else {
+            return rotacaoDuplaEsquerda(no);
+        }
+        }
+    
+        return no; // A árvore já está balanceada
     }
     public int calcularAltura(Bnode node) {
         if (node == null) {
@@ -92,7 +108,7 @@ public class Bnode {
         } else {
             int alturaEsq = calcularAltura(node.esq);
             int alturaDir = calcularAltura(node.dir);
-            return alturaEsq - alturaDir;
+            return alturaDir - alturaEsq;
         }
     }
 
